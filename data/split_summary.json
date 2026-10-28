@@ -1,0 +1,41 @@
+{
+  "seed": 42,
+  "counts": {
+    "ballpoint": {
+      "train": 865,
+      "val": 185,
+      "test": 186,
+      "total": 1236
+    },
+    "file": {
+      "train": 907,
+      "val": 194,
+      "test": 196,
+      "total": 1297
+    },
+    "monitor": {
+      "train": 1007,
+      "val": 216,
+      "test": 217,
+      "total": 1440
+    },
+    "pencil_sharpener": {
+      "train": 908,
+      "val": 194,
+      "test": 196,
+      "total": 1298
+    },
+    "printer": {
+      "train": 993,
+      "val": 213,
+      "test": 214,
+      "total": 1420
+    },
+    "rubber_eraser": {
+      "train": 894,
+      "val": 191,
+      "test": 193,
+      "total": 1278
+    }
+  }
+}
