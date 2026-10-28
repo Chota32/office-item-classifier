@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 raw_data/
 captures/
+.venv/
