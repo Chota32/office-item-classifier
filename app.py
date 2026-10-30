@@ -82,6 +82,23 @@ def cmd_split(a):
         print(f"{cls:<12}{c['train']:>7}{c['val']:>6}{c['test']:>6}{c['total']:>7}")
 
 
+# Create pretrained MobileNetV3 Small classifier
+def create_model(num_classes=6):
+
+    weights = models.MobileNet_V3_Small_Weights.DEFAULT
+    model = models.mobilenet_v3_small(weights=weights)
+
+    # Freeze pretrained layers
+    for param in model.parameters():
+        param.requires_grad = False
+
+    # Adapt the classifier to the six office item classes
+    in_features = model.classifier[-1].in_features
+    model.classifier[-1] = nn.Linear(in_features, num_classes)
+
+    return model
+
+
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():
     p = argparse.ArgumentParser(description="Office item classifier")
