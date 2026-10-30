@@ -99,6 +99,31 @@ def create_model(num_classes=6):
     return model
 
 
+# Load training and validation datasets
+def load_datasets(batch_size=32):
+    train_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        transforms.Normalize(MEAN, STD)
+        ])
+
+    val_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(MEAN, STD)
+        ])
+
+    train_dataset = datasets.ImageFolder("data/train", transform=train_transforms)
+    val_dataset = datasets.ImageFolder("data/val", transform=val_transforms)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, val_loader
+
+
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():
     p = argparse.ArgumentParser(description="Office item classifier")
