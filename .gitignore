@@ -4,3 +4,4 @@ __pycache__/
 raw_data/
 captures/
 .venv/
+model.pt

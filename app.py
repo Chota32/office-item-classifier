@@ -131,13 +131,15 @@ def load_datasets(batch_size=32):
 ])
 
 def cmd_train(args):
-    
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     train_loader, val_loader = load_datasets()
 
     model = create_model().to(device)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.classifier[-1].parameters(), lr=args.lr)
+    
+    best_accuracy = 0.0
 
     for epoch in range(args.epochs):
         model.eval()
@@ -170,6 +172,20 @@ def cmd_train(args):
 
                 val_loss += loss.item() * len(images)
                 val_correct += (outputs.argmax(1) == labels).sum().item()
+
+        val_accuracy = val_correct / len(val_loader.dataset)
+
+        if val_accuracy > best_accuracy:
+            best_accuracy = val_accuracy
+
+            torch.save({
+                "model_state_dict": model.state_dict(),
+                "class_names": train_loader.dataset.classes,
+                "model_name": "mobilenet_v3_small",
+                "image_size": 224
+                }, MODEL_PATH)
+
+        print(f"Model saved to {MODEL_PATH}")
 
         train_count = len(train_loader.dataset)
         val_count = len(val_loader.dataset)
