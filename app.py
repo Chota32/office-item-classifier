@@ -124,6 +124,61 @@ def load_datasets(batch_size=32):
     return train_loader, val_loader
 
 
+@command("train", "Train and validate the classifier",
+[
+    (("--epochs",), dict(type=int, default=5)),
+    (("--lr",), dict(type=float, default=0.001))
+])
+
+def cmd_train(args):
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    train_loader, val_loader = load_datasets()
+
+    model = create_model().to(device)
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.classifier[-1].parameters(), lr=args.lr)
+
+    for epoch in range(args.epochs):
+        model.eval()
+        model.classifier[-1].train()
+        train_loss, train_correct = 0, 0
+
+        for images, labels in train_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = loss_fn(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item() * len(images)
+            train_correct += (outputs.argmax(1) == labels).sum().item()
+
+        model.eval()
+        val_loss, val_correct = 0, 0
+
+        with torch.no_grad():
+            for images, labels in val_loader:
+                images = images.to(device)
+                labels = labels.to(device)
+
+                outputs = model(images)
+                loss = loss_fn(outputs, labels)
+
+                val_loss += loss.item() * len(images)
+                val_correct += (outputs.argmax(1) == labels).sum().item()
+
+        train_count = len(train_loader.dataset)
+        val_count = len(val_loader.dataset)
+
+        print(f"Epoch {epoch + 1}/{args.epochs}")
+        print(f"Training loss: {train_loss / train_count:.4f}, accuracy: {train_correct / train_count:.2%}")
+        print(f"Validation loss: {val_loss / val_count:.4f}, accuracy: {val_correct / val_count:.2%}")
+
+
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():
     p = argparse.ArgumentParser(description="Office item classifier")
