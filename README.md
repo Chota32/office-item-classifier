@@ -1,5 +1,8 @@
 # office-item-classifier
 
+## Testing
+test_training.py will train the model for one epoch and may overwrite the existing model.pt checkpoint.
+
 ## Dataset Sources
 Item: Ballpoint
 Source: https://images.cv/dataset/ballpoint-image-classification-dataset
