@@ -82,6 +82,119 @@ def cmd_split(a):
         print(f"{cls:<12}{c['train']:>7}{c['val']:>6}{c['test']:>6}{c['total']:>7}")
 
 
+# Create pretrained MobileNetV3 Small classifier
+def create_model(num_classes=6):
+
+    weights = models.MobileNet_V3_Small_Weights.DEFAULT
+    model = models.mobilenet_v3_small(weights=weights)
+
+    # Freeze pretrained layers
+    for param in model.parameters():
+        param.requires_grad = False
+
+    # Adapt the classifier to the six office item classes
+    in_features = model.classifier[-1].in_features
+    model.classifier[-1] = nn.Linear(in_features, num_classes)
+
+    return model
+
+
+# Load training and validation datasets
+def load_datasets(batch_size=32):
+    train_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        transforms.Normalize(MEAN, STD)
+        ])
+
+    val_transforms = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(MEAN, STD)
+        ])
+
+    train_dataset = datasets.ImageFolder("data/train", transform=train_transforms)
+    val_dataset = datasets.ImageFolder("data/val", transform=val_transforms)
+
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, val_loader
+
+
+@command("train", "Train and validate the classifier",
+[
+    (("--epochs",), dict(type=int, default=5)),
+    (("--lr",), dict(type=float, default=0.001))
+])
+
+def cmd_train(args):
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    train_loader, val_loader = load_datasets()
+
+    model = create_model().to(device)
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.classifier[-1].parameters(), lr=args.lr)
+    
+    best_accuracy = 0.0
+
+    for epoch in range(args.epochs):
+        model.eval()
+        model.classifier[-1].train()
+        train_loss, train_correct = 0, 0
+
+        for images, labels in train_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = loss_fn(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+            train_loss += loss.item() * len(images)
+            train_correct += (outputs.argmax(1) == labels).sum().item()
+
+        model.eval()
+        val_loss, val_correct = 0, 0
+
+        with torch.no_grad():
+            for images, labels in val_loader:
+                images = images.to(device)
+                labels = labels.to(device)
+
+                outputs = model(images)
+                loss = loss_fn(outputs, labels)
+
+                val_loss += loss.item() * len(images)
+                val_correct += (outputs.argmax(1) == labels).sum().item()
+
+        val_accuracy = val_correct / len(val_loader.dataset)
+
+        if val_accuracy > best_accuracy:
+            best_accuracy = val_accuracy
+
+            torch.save({
+                "model_state_dict": model.state_dict(),
+                "class_names": train_loader.dataset.classes,
+                "model_name": "mobilenet_v3_small",
+                "image_size": 224
+                }, MODEL_PATH)
+
+        print(f"Model saved to {MODEL_PATH}")
+
+        train_count = len(train_loader.dataset)
+        val_count = len(val_loader.dataset)
+
+        print(f"Epoch {epoch + 1}/{args.epochs}")
+        print(f"Training loss: {train_loss / train_count:.4f}, accuracy: {train_correct / train_count:.2%}")
+        print(f"Validation loss: {val_loss / val_count:.4f}, accuracy: {val_correct / val_count:.2%}")
+
+
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():
     p = argparse.ArgumentParser(description="Office item classifier")
