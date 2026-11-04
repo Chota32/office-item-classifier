@@ -3,6 +3,17 @@
 ## Testing
 test_training.py will train the model for one epoch and may overwrite the existing model.pt checkpoint.
 
+## Dataset
+
+The dataset contains 7,969 images across six office-item classes: ballpoint, file, monitor, pencil sharpener, printer and rubber eraser. Images were obtained from Images.cv.
+
+The dataset was divided into:
+- Training: 5,574 images (approximately 70%)
+- Validation: 1,193 images (approximately 15%)
+- Testing: 1,202 images (approximately 15%)
+
+During dataset preparation, images are converted to RGB, resized to a maximum side length of 640 pixels while preserving aspect ratio, and saved as JPEG. For model input, images are resized to 224 x 224 pixels and normalised using ImageNet mean and standard deviation values. Random horizontal flipping and rotation are applied only during training.
+
 ## Dataset Sources
 Item: Ballpoint
 Source: https://images.cv/dataset/ballpoint-image-classification-dataset
