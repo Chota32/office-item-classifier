@@ -141,6 +141,9 @@ def cmd_train(args):
     
     best_accuracy = 0.0
 
+    # Store training and validation metrics for each epoch
+    history = []
+
     for epoch in range(args.epochs):
         model.eval()
         model.classifier[-1].train()
@@ -194,6 +197,24 @@ def cmd_train(args):
         print(f"Training loss: {train_loss / train_count:.4f}, accuracy: {train_correct / train_count:.2%}")
         print(f"Validation loss: {val_loss / val_count:.4f}, accuracy: {val_correct / val_count:.2%}")
 
+        history.append({
+            "epoch": epoch + 1,
+            "train_loss": train_loss / train_count,
+            "train_accuracy": train_correct / train_count,
+            "val_loss": val_loss / val_count,
+            "val_accuracy": val_correct / val_count
+        })
+
+    # Save training history to CSV for later analysis and plotting
+    with open("training_history.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "epoch", "train_loss", "train_accuracy",
+            "val_loss", "val_accuracy"
+        ])
+        writer.writeheader()
+        writer.writerows(history)
+        
+    print("Training history saved to training_history.csv")
 
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():
