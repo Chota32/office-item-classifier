@@ -4,3 +4,5 @@ __pycache__/
 raw_data/
 captures/
 .venv/
+model_2epochs.pt
+model_5epochs.pt
