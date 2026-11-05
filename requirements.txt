@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 matplotlib
 numpy
 Pillow
 scikit-learn
 torch
 torchvision
+=======
+torch
+torchvision
+numpy
+matplotlib
+Pillow
+scikit-learn
+>>>>>>> origin/main
