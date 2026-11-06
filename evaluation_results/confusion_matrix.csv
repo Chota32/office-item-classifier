@@ -1,0 +1,7 @@
+true/predicted,ballpoint,file,monitor,pencil_sharpener,printer,rubber_eraser
+ballpoint,160,1,1,7,5,12
+file,1,171,7,0,15,2
+monitor,0,3,202,1,10,1
+pencil_sharpener,2,2,2,167,3,20
+printer,2,6,5,1,200,0
+rubber_eraser,21,1,0,19,0,152
