@@ -138,8 +138,11 @@ def cmd_train(args):
     model = create_model().to(device)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.classifier[-1].parameters(), lr=args.lr)
-
+    
     best_accuracy = 0.0
+
+    # Store training and validation metrics for each epoch
+    history = []
 
     for epoch in range(args.epochs):
         model.eval()
@@ -194,40 +197,24 @@ def cmd_train(args):
         print(f"Training loss: {train_loss / train_count:.4f}, accuracy: {train_correct / train_count:.2%}")
         print(f"Validation loss: {val_loss / val_count:.4f}, accuracy: {val_correct / val_count:.2%}")
 
+        history.append({
+            "epoch": epoch + 1,
+            "train_loss": train_loss / train_count,
+            "train_accuracy": train_correct / train_count,
+            "val_loss": val_loss / val_count,
+            "val_accuracy": val_correct / val_count
+        })
 
-@command("evaluate", "Evaluate model on the held-out test set", [
-    (("--checkpoint",), dict(default=MODEL_PATH)),
-    (("--test-dir",), dict(default="data/test")),
-    (("--output-dir",), dict(default="evaluation_results")),
-    (("--batch-size",), dict(type=int, default=32)),
-])
-def cmd_evaluate(args):
-    from evaluate import run_evaluation
-
-    run_evaluation(
-        checkpoint_path=args.checkpoint,
-        test_dir=args.test_dir,
-        output_dir=args.output_dir,
-        batch_size=args.batch_size,
-    )
-
-
-@command("robustness", "Test model robustness to image perturbations", [
-    (("--checkpoint",), dict(default=MODEL_PATH)),
-    (("--test-dir",), dict(default="data/test")),
-    (("--output",), dict(default="robustness_results.json")),
-    (("--batch-size",), dict(type=int, default=32)),
-])
-def cmd_robustness(args):
-    from robustness import run_robustness
-
-    run_robustness(
-        checkpoint_path=args.checkpoint,
-        test_dir=args.test_dir,
-        output_path=args.output,
-        batch_size=args.batch_size,
-    )
-
+    # Save training history to CSV for later analysis and plotting
+    with open("training_history.csv", "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "epoch", "train_loss", "train_accuracy",
+            "val_loss", "val_accuracy"
+        ])
+        writer.writeheader()
+        writer.writerows(history)
+        
+    print("Training history saved to training_history.csv")
 
 # ==================== PASTE NEW COMMANDS ABOVE THIS LINE ====================
 def main():

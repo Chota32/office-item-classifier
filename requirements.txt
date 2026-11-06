@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-matplotlib
-numpy
-Pillow
-scikit-learn
-torch
-torchvision
-=======
+
 torch
 torchvision
 numpy
-matplotlib
-Pillow
+pillow
 scikit-learn
->>>>>>> origin/main
+matplotlib
+opencv-python
+pytest
