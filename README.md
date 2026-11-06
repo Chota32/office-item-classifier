@@ -33,6 +33,23 @@ Source: https://images.cv/dataset/printer-image-classification-dataset
 Item: Rubber eraser:
 Source: https://images.cv/dataset/rubber-eraser-image-classification-dataset
 
+## Model and Training
+
+The classifier uses MobileNetV3 Small with pretrained ImageNet weights. The pretrained layers are frozen, and the final classification layer is replaced to recognise the six office-item categories.
+
+Training images are resized to 224x224, normalised, and augmented using random horizontal flipping and rotation.
+
+To train the model:
+```bash
+python app.py train --epochs 5
+```
+
+The model uses cross-entropy loss and the Adam optimiser. The checkpoint with the highest validation accuracy is saved as 'model.pt'.
+
+In our five epoch experiment, the best validation accuracy was 89.02% at epoch 2.
+
+Training results are recorded in 'training_history.csv', with accuracy and loss graphs saved as 'training_accuracy.png' and 'training_loss.png'.
+
 ## Prediction
 
 ```bash
