@@ -107,3 +107,40 @@ Troubleshooting:
 - Every image `Skipped`: the images are Git LFS placeholders, so run `git lfs install` then `git lfs pull`.
 
 Tests (these do not overwrite `model.pt`): `python -m pytest tests/test_predict.py -v`
+
+
+## Evaluation
+
+To evaluate the trained model on the test dataset:
+
+```bash
+python evaluate.py
+```
+
+The results are saved in `evaluation_results/`, including the
+classification report, confusion matrix and misclassified images.
+
+Test results on 1,202 images:
+- Accuracy: 87.52%
+- Macro-F1: 87.34%
+
+## Robustness Testing
+
+To run the robustness tests:
+
+```bash
+python robustness.py
+```
+
+The tests apply Gaussian blur, 15-degree rotation, and brightness
+changes of 50% and 150%.
+
+The results are saved in `robustness_results.json`.
+
+Accuracy under different conditions:
+- Original images: 87.52%
+- Blur: 84.44%
+- Rotation: 81.95%
+- Darkened: 86.69%
+- Brightened: 84.94%
+
