@@ -50,15 +50,57 @@ In our five epoch experiment, the best validation accuracy was 89.02% at epoch 2
 
 Training results are recorded in 'training_history.csv', with accuracy and loss graphs saved as 'training_accuracy.png' and 'training_loss.png'.
 
-## Prediction
+
+## Installation
+
+Install the required Python packages:
 
 ```bash
-python predict.py --image photo.jpg       # one or more image files
-python predict.py --folder data/test      # every image in a folder
-python predict.py --camera                # live webcam, press q to quit
+python -m pip install -r requirements.txt
 ```
 
-Example output: `printer_test_0000.jpg -> printer (99.9%)`
+The trained model is stored in `model.pt`. Git LFS is used to track
+the model file. After cloning the repository, run:
+
+```bash
+git lfs pull
+```
+
+## Prediction
+
+Predict a single image:
+
+```bash
+python predict.py --image path/to/image.jpg
+```
+
+Predict all images in a folder:
+
+```bash
+python predict.py --folder path/to/folder
+```
+
+Use a webcam:
+
+```bash
+python predict.py --camera 0
+```
+
+The program displays the predicted class and confidence score.
+
+## Tests
+
+Run the automated tests:
+
+```bash
+python -m pytest -v
+```
+
+All 20 tests passed during the final test run.
+
+Note: The training test may overwrite `model.pt` and
+`training_history.csv`. Back up these files before running all tests.
+
 
 Troubleshooting:
 - `Model 'model.pt' not found`: run from the project folder, or train with `python app.py train`.
